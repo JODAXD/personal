@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario de Protectores</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-color: #1d1d1d;
+      --text-color: #e2e8f0;
+      --accent-color: #00b0ff;
+      --button-color: #1db8ff;
+      --danger-color: #ff3b30;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    h2 {
+      color: var(--accent-color);
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+
+    .form {
+      background: var(--card-color);
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      margin-bottom: 30px;
+    }
+
+    input, button {
+      padding: 15px;
+      margin: 10px 0;
+      border: 2px solid var(--accent-color);
+      border-radius: 8px;
+      background-color: #1a1a1a;
+      color: var(--text-color);
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: var(--button-color);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: var(--accent-color);
+    }
+
+    table {
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background-color: var(--card-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 2px solid var(--accent-color);
+    }
+
+    th {
+      background-color: #1d1d1d;
+      color: var(--accent-color);
+    }
+
+    td {
+      color: #bbb;
+    }
+
+    td button {
+      background-color: var(--danger-color);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s;
+    }
+
+    td button:hover {
+      background-color: #ff2d1f;
+    }
+
+    @media (max-width: 768px) {
+      .form {
+        width: 100%;
+      }
+      table {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Inventario de Protectores de Pantalla</h2>
+  
+  <div class="form">
+    <input id="producto" placeholder="Nombre del producto" required>
+    <input id="cantidad" type="number" placeholder="Cantidad" required>
+    <input id="precio" type="number" placeholder="Precio unitario (Bs)" required>
+    <input id="fecha" type="date" required>
+    <input id="notas" placeholder="Notas (ej. para iPhone, cliente reservado, etc.)">
+    <button onclick="agregarProducto()">Agregar Producto</button>
+  </div>
+
+  <table id="tabla">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio (Bs)</th>
+        <th>Fecha</th>
+        <th>Notas</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    let productos = JSON.parse(localStorage.getItem("inventario")) || [];
+
+    function renderTabla() {
+      const tbody = document.querySelector("#tabla tbody");
+      tbody.innerHTML = "";
+      productos.forEach((p, i) => {
+        const fila = `<tr>
+          <td>${i + 1}</td>
+          <td>${p.producto}</td>
+          <td>${p.cantidad}</td>
+          <td>${p.precio}</td>
+          <td>${p.fecha}</td>
+          <td>${p.notas}</td>
+          <td><button onclick="eliminar(${i})">Eliminar</button></td>
+        </tr>`;
+        tbody.innerHTML += fila;
+      });
+    }
+
+    function agregarProducto() {
+      const producto = document.getElementById("producto").value;
+      const cantidad = document.getElementById("cantidad").value;
+      const precio = document.getElementById("precio").value;
+      const fecha = document.getElementById("fecha").value;
+      const notas = document.getElementById("notas").value;
+
+      if (!producto || !cantidad || !precio || !fecha) {
+        alert("Por favor completa todos los campos obligatorios.");
+        return;
+      }
+
+      productos.push({ producto, cantidad, precio, fecha, notas });
+      localStorage.setItem("inventario", JSON.stringify(productos));
+      renderTabla();
+
+      // Limpiar los campos del formulario
+      document.querySelectorAll(".form input").forEach(input => input.value = "");
+    }
+
+    function eliminar(index) {
+      if (confirm("¿Eliminar este producto?")) {
+        productos.splice(index, 1);
+        localStorage.setItem("inventario", JSON.stringify(productos));
+        renderTabla();
+      }
+    }
+
+    renderTabla();
+  </script>
+</body>
+</html>
